@@ -5,7 +5,7 @@ from ar import process_frame
 
 def main():
     # Initialize R-CNN
-    detector = RCNNDetector(device='cuda', conf_thresh=0.5)
+    detector = RCNNDetector(device='cuda', conf_thresh=0.7)
 
     # Open the camera
     cap = cv2.VideoCapture(0)
