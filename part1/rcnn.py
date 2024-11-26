@@ -2,7 +2,7 @@ import cv2
 import torch
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from torchvision.transforms import functional as F
-import numpy as np
+from utils import get_label_from_id
 
 
 class RCNNDetector:
