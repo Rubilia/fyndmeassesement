@@ -34,7 +34,7 @@ def create_product():
 
     product = validation_result.model_dump()
     with product_lock:
-        if product["id"] in products:
+        if str(product["id"]) in products:
             return jsonify(format_response(
                 message="Conflict",
                 error=f"Product with ID {product['id']} already exists"
@@ -63,6 +63,7 @@ def get_all_products():
 
 
 @products_bp.route("/<product_id>", methods=["GET"])
+@products_bp.route("/<product_id>/", methods=["GET"])
 def get_product(product_id):
     """
     Retrieve a specific product by ID
@@ -83,6 +84,7 @@ def get_product(product_id):
 
 
 @products_bp.route("/<product_id>", methods=["PUT"])
+@products_bp.route("/<product_id>/", methods=["PUT"])
 def update_product(product_id):
     """
     Update a specific product
@@ -113,6 +115,7 @@ def update_product(product_id):
 
 
 @products_bp.route("/<product_id>", methods=["DELETE"])
+@products_bp.route("/<product_id>/", methods=["DELETE"])
 def delete_product(product_id):
     """
     Delete a specific product
