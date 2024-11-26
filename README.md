@@ -119,8 +119,10 @@ Gunicorn is configured to use a single process with multiple threads:
 cd part2
 gunicorn -w 1 --threads 4 -b 0.0.0.0:8000 app:create_app
 ```
+
 - `-w 1`: Specifies one worker process, ensuring a single memory space for the shared dictionary.
 - `--threads 4`: Enables four threads for handling concurrent requests.
+
 ---
 
 ## API Endpoints
@@ -225,18 +227,22 @@ gunicorn -w 1 --threads 4 -b 0.0.0.0:8000 app:create_app
 ## Limitations
 
 1. **Product ID**:
+
    - Must be a valid UUID (e.g., `"123e4567-e89b-12d3-a456-426614174000"`).
    - Invalid UUIDs will result in a `400 Bad Request` error.
 
 2. **Product Name**:
+
    - Must be at least 6 characters long.
    - Shorter names will result in a `400 Bad Request` error.
 
 3. **Price**:
+
    - Must be a positive number greater than 0.
    - Negative or zero prices will result in a `400 Bad Request` error.
 
 4. **Quantity**:
+
    - Must be an integer between 1 and 10 (inclusive).
    - Quantities outside this range will result in a `400 Bad Request` error.
 
@@ -260,3 +266,74 @@ gunicorn -w 1 --threads 4 -b 0.0.0.0:8000 app:create_app
 
 - Logs all actions and errors.
 - Unhandled exceptions are logged with a traceback for debugging.
+
+# Part 3: Real time object deterction in AR
+
+This project demonstrates AR integration with object detection using the Faster R-CNN. The application uses OpenCV to process real-time video from the camera, detect objects, and overlay visual effects such as bounding boxes, labels, and highlights on detected objects.
+
+---
+
+## Features
+
+### **1. Real-Time Object Detection**
+
+- Utilizes the Faster R-CNN model pre-trained on the COCO dataset to detect objects in real-time.
+- Objects are classified into one of 80 predefined categories
+
+### **2. Augmented Reality Effects**
+
+- Draws **bounding boxes** around detected objects with a unique color for each category.
+- Adds **labels** and confidence scores to detected objects, with font sizes dynamically scaled based on the object size.
+- Highlights detected objects with a semi-transparent overlay for better visualization.
+
+### **3. Category Color Mapping**
+
+- Each object category is assigned a **unique color** using interpolation from a colormap.
+- Ensures consistent and visually distinct colors for each category.
+
+### **4. Modular Codebase**
+
+- The project is structured into modular components:
+  - **`rcnn.py`**: Handles object detection using Faster R-CNN.
+  - **`ar.py`**: Processes frames to overlay AR effects.
+  - **`drawing.py`**: Manages drawing of bounding boxes, labels, and highlights.
+  - **`utils.py`**: Provides utility functions for color generation, font scaling, and category mapping.
+
+### **5. GPU Support**
+
+- Supports GPU acceleration via PyTorch for faster object detection.
+
+### **6. Highly Configurable**
+
+- Detection confidence threshold and device (`cpu` or `cuda`) can be configured when initializing the detector.
+- AR effects (e.g., highlight transparency, font size scaling) are adjustable through utility functions.
+
+---
+
+## Usage
+
+### Running the Application
+
+1. Start the application:
+
+```
+cd part3
+python main.py
+```
+
+2. The camera feed will open in a new window, showing detected objects with bounding boxes, labels, and highlights.
+
+3. Press `q` to exit the application.
+
+---
+
+## Project Structure
+
+```
+part3/
+├── main.py         # Entry point for running the application
+├── ar.py           # Processes frames and applies AR effects
+├── drawing.py      # Handles bounding box and label rendering
+├── rcnn.py         # Object detection using Faster R-CNN
+└── utils.py        # Utility functions for scaling and color mapping
+```

@@ -24,17 +24,13 @@ def draw_bounding_box(image, bbox, label, confidence):
 
 def highlight_object(image, bbox, alpha=0.4):
     """
-    Apply a semi-transparent highlight to a detected object.
-    Args:
-        image (ndarray): Image to draw on.
-        bbox (list or tuple): Bounding box coordinates [x1, y1, x2, y2].
-        alpha (float): Transparency level.
+    Apply a semi-transparent highlight to a detected object
     """
     assert len(bbox) == 4, f"Expected bbox of length 4, got {len(bbox)}: {bbox}"
     x1, y1, x2, y2 = map(int, bbox)
 
     overlay = image.copy()
-    color = get_color_for_category("highlight")  # Highlight color
+    color = get_color_for_category("highlight")
     assert len(color) == 3, f"Expected color of length 3, got {len(color)}: {color}"
 
     cv2.rectangle(overlay, (x1, y1), (x2, y2), color, -1)
