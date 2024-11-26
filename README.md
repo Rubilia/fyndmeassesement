@@ -8,7 +8,7 @@ This tool is a CLI application that performs object detection on images using a 
 
 ```
 git clone https://github.com/Rubilia/fyndmeassesement.git
-cd fyndmeassesement
+cd fyndmeassesement/
 ```
 
 2. Install the dependencies:
@@ -35,7 +35,8 @@ pip install -r requirements.txt
 Detect objects in a folder of images and save results:
 
 ```
-python part1/cli.py -i data/images -o data/output --conf-thresh 0.7 --save-json -d cuda
+cd part1/
+python cli.py -i data/images -o data/output --conf-thresh 0.7 --save-json -d cuda
 ```
 
 ## How It Works
@@ -116,7 +117,7 @@ To handle concurrency properly something more than just a Flask developement ser
 Gunicorn is configured to use a single process with multiple threads:
 
 ```
-cd part2
+cd part2/
 gunicorn -w 1 --threads 4 -b 0.0.0.0:8000 app:create_app
 ```
 
@@ -317,7 +318,7 @@ This project demonstrates AR integration with object detection using the Faster 
 1. Start the application:
 
 ```
-cd part3
+cd part3/
 python main.py
 ```
 
