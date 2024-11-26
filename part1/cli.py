@@ -1,6 +1,10 @@
-import argparse
 import os
-from utils import setup_logger
+import cv2
+import argparse
+
+from rcnn import RCNNDetector
+from utils import save_to_json, setup_logger
+from visualize import draw_bounding_boxes
 
 
 logger = setup_logger("part1")
@@ -29,8 +33,42 @@ def main():
     # Create output Dir if it doesn't exist
     output_dir = args.output
     os.makedirs(output_dir, exist_ok=True)
+    
+    # Initialize R-CNN detector
+    detector = RCNNDetector(device=args.device, conf_thresh=args.conf_thresh)
+
+    # Process images
+    process_images(image_files, output_dir, detector, args.save_json, args.batch_size)
 
 
+def process_images(image_files, output_dir, detector, save_json, batch_size):
+    """
+    Process a list of images using the R-CNN detector.
+    Args:
+        image_files (list[str]): List of image file paths.
+        output_dir (str): Directory to save outputs.
+        detector (RCNNDetector): Initialized R-CNN detector.
+        save_json (bool): Whether to save results to JSON.
+        batch_size (int): Batch size for processing images.
+    """
+    all_detections = []
+    for i in range(0, len(image_files), batch_size):
+        batch_files = image_files[i:i+batch_size]
+        batch_images = [cv2.imread(file) for file in batch_files]
+        predictions = detector.predict(batch_images)
+
+        for image_path, image, prediction in zip(batch_files, batch_images, predictions):
+            logger.info(f"Processing {image_path}...")
+            # Save results
+            output_path = os.path.join(output_dir, os.path.basename(image_path))
+            annotated_image = draw_bounding_boxes(image, prediction)
+            cv2.imwrite(output_path, annotated_image)
+            if save_json:
+                all_detections.append({"image": image_path, "detections": prediction})
+    if save_json:
+        json_path = os.path.join(output_dir, "results.json")
+        save_to_json(all_detections, json_path)
+        logger.info(f"Results saved to {json_path}")
 
 
 def collect_image_files(input_paths):
@@ -48,6 +86,7 @@ def collect_image_files(input_paths):
         else:
             logger.warning(f"Invalid path or unsupported file type: {path}")
     return image_files
+
 
 
 if __name__ == "__main__":
