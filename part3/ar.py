@@ -8,6 +8,7 @@ def process_frame(frame, detections):
     for detection in detections:
         bbox = detection["bbox"]
         label = detection["label"]  # Already resolved by `get_label_from_id`
+        if not label in ['person', 'train', 'fork']: continue
         confidence = detection["score"]
 
         # Highlight detected object

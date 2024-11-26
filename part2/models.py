@@ -1,6 +1,6 @@
 from threading import Lock
 from pydantic import BaseModel, Field, UUID4
-from typing import Literal
+from typing import Literal, Optional
 
 CATEGORIES = [
     "Electronics", "Home Appliances", "Books", "Fashion", "Toys",
@@ -17,6 +17,18 @@ class Product(BaseModel):
         "Electronics", "Home Appliances", "Books", "Fashion", "Toys",
         "Furniture", "Groceries", "Fitness", "Beauty", "Automotive"
     ]
+
+
+class ProductUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=6)
+    description: Optional[str] = None
+    price: Optional[float] = Field(None, gt=0)
+    quantity: Optional[int] = Field(None, ge=1, le=10)
+    category: Optional[str] = None
+
+
+def validate_product_update(data):
+    return ProductUpdate(**data)
 
 
 # Shared in-memory data structure. In the future can be expanded to interact with Database or Redis for processing parallelism as opposed to threading

@@ -1,6 +1,8 @@
 from flask import Blueprint, jsonify, request
-from models import products, product_lock
+from models import products, product_lock, validate_product_update
 from utils import validate_product_data
+from pydantic import ValidationError
+from uuid import UUID
 import logging
 
 # Initialize Blueprint
@@ -89,15 +91,30 @@ def update_product(product_id):
     """
     Update a specific product
     """
-    data = request.json
-    validation_result = validate_product_data(data)
-    if isinstance(validation_result, str):
+    # Validate if the product_id is a valid UUID
+    try:
+        UUID(product_id)
+    except ValueError:
+        logger.warning(f"Invalid product ID format: {product_id}")
         return jsonify(format_response(
             message="Validation failed",
-            error=validation_result
+            error="Invalid product ID format"
         )), 400
 
-    product = validation_result.model_dump()
+    # Parse and validate the JSON payload
+    data = request.json
+    try:
+        validation_result = validate_product_update(data)  # Use partial update schema
+    except ValidationError as e:
+        logger.warning(f"Validation error for product update: {str(e)}")
+        return jsonify(format_response(
+            message="Validation failed",
+            error=str(e)
+        )), 400
+
+    product_updates = validation_result.dict(exclude_unset=True)  # Allow partial updates
+
+    # Lock and update the product
     with product_lock:
         if product_id not in products:
             logger.warning(f"Product ID {product_id} not found.")
@@ -105,7 +122,10 @@ def update_product(product_id):
                 message="Product not found",
                 error=f"No product found with ID {product_id}"
             )), 404
-        products[product_id].update(product)
+
+        # Update only the provided fields
+        products[product_id].update(product_updates)
+
     logger.info(f"Product {product_id} updated successfully.")
     return jsonify(format_response(
         message="Product updated successfully",
